@@ -12,7 +12,6 @@ Their json payload is:
 `{'rulename': '7amweekdays', 'behavior': 'scaleup'}`  
 `{'rulename': '7pmweekdays', 'behavior': 'scaledown'}`  
 Does not support setting times, since it is running stateless  
-
 Sample input:  
 `{'rulename': '7amweekdays', 'behavior': 'scaledown'}`
 ----
