@@ -22,12 +22,14 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: "cron(0 5 * * 1-5)"  # time in utc, so -2 hours to ams
-            Input: {"rulename": "7amweekdays", "behavior": "scaleup"}
+            Input: >
+              {"rulename": "7amweekdays", "behavior": "scaleup"}
         7pmweekdays:
           Type: Schedule
           Properties:
             Schedule: "cron(0 5 * * 1-5)" # time in utc, so -2 hours to ams
-            Input: {"rulename": "7pmweekdays", "behavior": "scaledown"}
+            Input: >
+              {"rulename": "7pmweekdays", "behavior": "scaledown"}
 
 Outputs:
   ECSServiceSchedulerFunction:
