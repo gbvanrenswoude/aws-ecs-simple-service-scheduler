@@ -1,32 +1,104 @@
 #!/usr/bin/python3
 
 """
-Simple service scheduler for ECS. Queries out all running clusters. For each cluster, describes service tags.
-If the tag desiredofficehours is set to n, will update the service to desiredcount n at 7am.
-CLoudwatch rules will fire an event called 7amweekdays
-If the tag desiredoutofofficehours is set to n, will update the service to desiredcount n at 7pm.
-CLoudwatch rules will fire an event called 7pmweekdays
+Simple service scheduler for ECS. Queries out all running clusters. For each cluster, describes services and their tags.
+If tag AutoOff is set, will take action on the service.
+If the tag DesiredCountUp is set to n, will update the service to desiredcount n at 7am.
+If the tag DesiredCountDown is set to n, will update the service to desiredcount n at 7pm.
+Cloudwatch rules will fire 2 events called 7amweekdays and 7pmweekdays every workday to trigger the scaling up and scaling down.
+Their json payload is:
+{'rulename': '7amweekdays', 'behavior': 'scaleup'}
+{'rulename': '7pmweekdays', 'behavior': 'scaledown'}
 Does not support setting times, since it is running stateless
 
 Sample input:
-{
-    "version": "0",
-    "id": "53dc4d37-cffa-4f76-80c9-8b7d4a4d2eaa",
-    "detail-type": "Scheduled Event",
-    "source": "aws.events",
-    "account": "123456789012",
-    "time": "2015-10-08T16:53:06Z",
-    "region": "us-east-1",
-    "resources": [
-        "arn:aws:events:us-east-1:123456789012:rule/my-scheduled-rule"
-    ],
-    "detail": {}
-}
+{'rulename': '7amweekdays', 'behavior': 'scaledown'}
 """
 
 import boto3
+import json
+
+event = {'rulename': '7amweekdays'}
+context = ""
 
 def lambda_handler(event, context):
+    behavior = event['behavior']
+    print(behavior)
+    region = "eu-west-1"
+    # region = context.invoked_function_arn.split(":")[3]
+    if region == None:
+        region="eu-west-1"
+    client = boto3.client('ecs', region_name=region)
 
-    # Get Account ID from lambda function arn in the context
-    ACCOUNT_ID = context.invoked_function_arn.split(":")[4]
+    # list clusters
+    cluster_arns = []
+    response = client.list_clusters(
+    )
+    cluster_arns += response['clusterArns']
+    while "nextToken" in response:
+        response = client.list_clusters(
+            nextToken=response['nextToken']
+        )
+        cluster_arns += response['clusterArns']
+    print("Found the following cluster ARNs:" + str(cluster_arns))
+
+    # get all services per cluster in a dict, that has clusterarn as key, and a list of service arns as values
+    service_footprint={}
+    for cluster_arn in cluster_arns:
+        service_arns=[]
+        response = client.list_services(cluster=cluster_arn)
+        service_arns += response['serviceArns']
+        while "nextToken" in response:
+            response = client.list_services(
+                nextToken=response['nextToken'],
+                cluster=cluster_arn
+            )
+            service_arns += response['serviceArns']
+        service_footprint[cluster_arn] = service_arns
+    print("Found the following cluster ARNs:")
+    print(json.dumps(service_footprint))
+
+    # a for loop thru all the services per cluster, that checks their tag and if set, updates accordingly
+    for key, value in service_footprint.items():
+        cluster_arn = key
+        service_arn = value
+        print("Checking: " + service_arn)
+        response = client.describe_services(
+            cluster=cluster_arn,
+            services=[
+                service_arn,
+            ],
+            include=[
+                'TAGS',
+            ]
+        )
+        if "AutoOff" in response['services']['tags'] and behavior == 'scaledown':
+            if "DesiredCountDown" in response['services']['tags']:
+                desiredcount = response['services']['tags']['DesiredCountDown']
+            else:
+                desiredcount = 0
+            response = client.update_service(
+                cluster=cluster_arn,
+                service=service_arn,
+                desiredCount=desiredcount
+            )
+            print("Scaled down: " + json.dumps(response))
+        elif "AutoOff" in response['services']['tags'] and behavior == 'scaleup':
+            if "DesiredCountUp" in response['services']['tags']:
+                desiredcount = response['services']['tags']['DesiredCountUp']
+            else:
+                desiredcount = 1
+            response = client.update_service(
+                cluster=cluster_arn,
+                service=service_arn,
+                desiredCount=desiredcount
+            )
+            print("Scaled up: " + json.dumps(response))
+        else:
+            print("Ignoring " + service_arn + "...")
+            continue
+
+# testing locally
+lambda_handler(event, context)
+
+
