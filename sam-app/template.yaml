@@ -14,28 +14,25 @@ Resources:
       CodeUri: simple_ecs_service_scheduler/
       Handler: app.lambda_handler
       Runtime: python3.7
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - AmazonECS_FullAccess # Managed Policy
       Events:
         7amweekdays:
-          Type: CloudWatchEvent
+          Type: Schedule
           Properties:
-            Pattern:
+            Schedule: "cron(0 5 * * 1-5)"  # time in utc, so -2 hours to ams
             Input: {"rulename": "7amweekdays", "behavior": "scaleup"}
         7pmweekdays:
-          Type: CloudWatchEvent
+          Type: Schedule
           Properties:
-            Pattern:
+            Schedule: "cron(0 5 * * 1-5)" # time in utc, so -2 hours to ams
             Input: {"rulename": "7pmweekdays", "behavior": "scaledown"}
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
+  ECSServiceSchedulerFunction:
+    Description: "ECSServiceScheduler Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
+  ECSServiceSchedulerFunctionIamRole:
+    Description: "Implicit IAM Role created for ECSServiceScheduler function"
     Value: !GetAtt HelloWorldFunctionRole.Arn
