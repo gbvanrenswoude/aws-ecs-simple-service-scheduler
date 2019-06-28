@@ -1,8 +1,4 @@
-# simple-service-scheduler
-
-A simple MVP ECS service scheduler.
-
-----
+### A simple MVP ECS service scheduler.
 Simple service scheduler for ECS. Queries out all running clusters. For each cluster, describes services and their tags.  
 If tag AutoOff is set, will take action on the service.  
 If the tag DesiredCountUp is set to n, will update the service to desiredcount n at 7am.  
@@ -12,6 +8,6 @@ Their json payload is:
 `{'rulename': '7amweekdays', 'behavior': 'scaleup'}`  
 `{'rulename': '7pmweekdays', 'behavior': 'scaledown'}`  
 Does not support setting times, since it is running stateless  
-Sample input:  
+
+#### Sample input:  
 `{'rulename': '7amweekdays', 'behavior': 'scaledown'}`
-----
