@@ -18,16 +18,14 @@ Sample input:
 import boto3
 import json
 
-event = {'rulename': '7amweekdays'}
-context = ""
-
 def lambda_handler(event, context):
+    print("Running on boto3: " + boto3.__version__)
     behavior = event['behavior']
-    print(behavior)
-    region = "eu-west-1"
-    # region = context.invoked_function_arn.split(":")[3]
+    print("Behavior set to: " + behavior)
+    region = context.invoked_function_arn.split(":")[3]
     if region == None:
         region="eu-west-1"
+    print("Region set to: " + region)
     client = boto3.client('ecs', region_name=region)
 
     # list clusters
@@ -61,44 +59,40 @@ def lambda_handler(event, context):
     # a for loop thru all the services per cluster, that checks their tag and if set, updates accordingly
     for key, value in service_footprint.items():
         cluster_arn = key
-        service_arn = value
-        print("Checking: " + service_arn)
-        response = client.describe_services(
-            cluster=cluster_arn,
-            services=[
-                service_arn,
-            ],
-            include=[
-                'TAGS',
-            ]
-        )
-        if "AutoOff" in response['services']['tags'] and behavior == 'scaledown':
-            if "DesiredCountDown" in response['services']['tags']:
-                desiredcount = response['services']['tags']['DesiredCountDown']
-            else:
-                desiredcount = 0
-            response = client.update_service(
+        service_arns = value
+        for service_arn in service_arns:
+            print("Checking: " + service_arn)
+            response = client.describe_services(
                 cluster=cluster_arn,
-                service=service_arn,
-                desiredCount=desiredcount
+                services=[
+                    service_arn,
+                ],
+                include=[
+                    'TAGS',
+                ]
             )
-            print("Scaled down: " + json.dumps(response))
-        elif "AutoOff" in response['services']['tags'] and behavior == 'scaleup':
-            if "DesiredCountUp" in response['services']['tags']:
-                desiredcount = response['services']['tags']['DesiredCountUp']
+            if "AutoOff" in response['services']['tags'] and behavior == 'scaledown':
+                if "DesiredCountDown" in response['services']['tags']:
+                    desiredcount = response['services']['tags']['DesiredCountDown']
+                else:
+                    desiredcount = 1
+                response = client.update_service(
+                    cluster=cluster_arn,
+                    service=service_arn,
+                    desiredCount=desiredcount
+                )
+                print("Scaled down: " + json.dumps(response))
+            elif "AutoOff" in response['services']['tags'] and behavior == 'scaleup':
+                if "DesiredCountUp" in response['services']['tags']:
+                    desiredcount = response['services']['tags']['DesiredCountUp']
+                else:
+                    desiredcount = 1
+                response = client.update_service(
+                    cluster=cluster_arn,
+                    service=service_arn,
+                    desiredCount=desiredcount
+                )
+                print("Scaled up: " + json.dumps(response))
             else:
-                desiredcount = 1
-            response = client.update_service(
-                cluster=cluster_arn,
-                service=service_arn,
-                desiredCount=desiredcount
-            )
-            print("Scaled up: " + json.dumps(response))
-        else:
-            print("Ignoring " + service_arn + "...")
-            continue
-
-# testing locally
-lambda_handler(event, context)
-
-
+                print("Ignoring " + service_arn + "...")
+                continue
