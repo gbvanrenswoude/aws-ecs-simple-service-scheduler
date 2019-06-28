@@ -9,7 +9,7 @@ from simple_ecs_service_scheduler import app
 def cwrules_event():
     """ Generates CloudWatch Event"""
 
-    return {"rulename": "7amweekdays", "behavior": "scaledown"}
+    return {"rulename": "7amweekdays", "behavior": "scaleup"}
 
 def test_lambda_handler(cwrules_event, mocker):
 

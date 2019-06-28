@@ -75,7 +75,7 @@ def lambda_handler(event, context):
                 if "DesiredCountDown" in response['services']['tags']:
                     desiredcount = response['services']['tags']['DesiredCountDown']
                 else:
-                    desiredcount = 1
+                    desiredcount = 0
                 response = client.update_service(
                     cluster=cluster_arn,
                     service=service_arn,
