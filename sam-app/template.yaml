@@ -21,13 +21,13 @@ Resources:
         7amweekdays:
           Type: Schedule
           Properties:
-            Schedule: "cron(0 5 * * 1-5)"  # time in utc, so -2 hours to ams
+            Schedule: "cron(0 5 * * 1-5 *)"  # time in utc, so -2 hours to ams https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
             Input: >
               {"rulename": "7amweekdays", "behavior": "scaleup"}
         7pmweekdays:
           Type: Schedule
           Properties:
-            Schedule: "cron(0 5 * * 1-5)" # time in utc, so -2 hours to ams
+            Schedule: "cron(0 5 * * 1-5 *)" # time in utc, so -2 hours to ams
             Input: >
               {"rulename": "7pmweekdays", "behavior": "scaledown"}
 
