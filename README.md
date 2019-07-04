@@ -11,3 +11,7 @@ Does not support setting times, since it is running stateless
 
 #### Sample input:  
 `{'rulename': '7amweekdays', 'behavior': 'scaledown'}`
+
+
+#### TODO
+- Handle funny DesiredCountUp and DesiredCountDown tag values 
