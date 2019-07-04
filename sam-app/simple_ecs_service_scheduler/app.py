@@ -71,12 +71,12 @@ def lambda_handler(event, context):
                     'TAGS',
                 ]
             )
-            print(str(response))
             response = response["services"]
             response = response[0]
             print(str(response))
             print("Checking if Tags are supported yet for service: " + response['serviceArn'])
             if "tags" in response:
+                print("Tags set for service: " + response['serviceArn'])
                 if "NoAutoOff" not in response['tags'] and behavior == 'scaledown':
                     if "DesiredCountDown" in response['tags']:
                         desiredcount = response['tags']['DesiredCountDown']
@@ -87,7 +87,7 @@ def lambda_handler(event, context):
                         service=service_arn,
                         desiredCount=desiredcount
                     )
-                    print("Scaled down: " + json.dumps(response))
+                    print("Scaled down: " + service_arn)
                 elif "NoAutoOff" not in response['tags'] and behavior == 'scaleup':
                     if "DesiredCountUp" in response['tags']:
                         desiredcount = response['tags']['DesiredCountUp']
@@ -98,7 +98,7 @@ def lambda_handler(event, context):
                         service=service_arn,
                         desiredCount=desiredcount
                     )
-                    print("Scaled up: " + json.dumps(response))
+                    print("Scaled up: " + service_arn)
                 else:
                     print("Ignoring " + service_arn + "...")
                     continue
