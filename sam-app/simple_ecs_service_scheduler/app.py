@@ -76,7 +76,7 @@ def lambda_handler(event, context):
             response = response[0]
             print(str(response))
             print("Checking if Tags are supported yet for service: " + response['serviceArn'])
-            if 'tags' in response:
+            if "tags" in response:
                 if "NoAutoOff" not in response['tags'] and behavior == 'scaledown':
                     if "DesiredCountDown" in response['tags']:
                         desiredcount = response['tags']['DesiredCountDown']
