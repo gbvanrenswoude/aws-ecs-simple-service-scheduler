@@ -71,6 +71,7 @@ def lambda_handler(event, context):
                     'TAGS',
                 ]
             )
+            print(str(response))
             if "NoAutoOff" not in response['services']['tags'] and behavior == 'scaledown':
                 if "DesiredCountDown" in response['services']['tags']:
                     desiredcount = response['services']['tags']['DesiredCountDown']
