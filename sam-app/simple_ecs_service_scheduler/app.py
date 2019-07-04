@@ -71,29 +71,37 @@ def lambda_handler(event, context):
                     'TAGS',
                 ]
             )
+            print(str(response))  
+            response = response.get(services)
+            response = response[0]
             print(str(response))
-            if "NoAutoOff" not in response['services']['tags'] and behavior == 'scaledown':
-                if "DesiredCountDown" in response['services']['tags']:
-                    desiredcount = response['services']['tags']['DesiredCountDown']
+            print("Checking if Tags are supported yet for service: " + response['serviceArn'])
+            if tags in response:
+                if "NoAutoOff" not in response['tags'] and behavior == 'scaledown':
+                    if "DesiredCountDown" in response['tags']:
+                        desiredcount = response['tags']['DesiredCountDown']
+                    else:
+                        desiredcount = 0
+                    response = client.update_service(
+                        cluster=cluster_arn,
+                        service=service_arn,
+                        desiredCount=desiredcount
+                    )
+                    print("Scaled down: " + json.dumps(response))
+                elif "NoAutoOff" not in response['tags'] and behavior == 'scaleup':
+                    if "DesiredCountUp" in response['tags']:
+                        desiredcount = response['tags']['DesiredCountUp']
+                    else:
+                        desiredcount = 1
+                    response = client.update_service(
+                        cluster=cluster_arn,
+                        service=service_arn,
+                        desiredCount=desiredcount
+                    )
+                    print("Scaled up: " + json.dumps(response))
                 else:
-                    desiredcount = 0
-                response = client.update_service(
-                    cluster=cluster_arn,
-                    service=service_arn,
-                    desiredCount=desiredcount
-                )
-                print("Scaled down: " + json.dumps(response))
-            elif "NoAutoOff" not in response['services']['tags'] and behavior == 'scaleup':
-                if "DesiredCountUp" in response['services']['tags']:
-                    desiredcount = response['services']['tags']['DesiredCountUp']
-                else:
-                    desiredcount = 1
-                response = client.update_service(
-                    cluster=cluster_arn,
-                    service=service_arn,
-                    desiredCount=desiredcount
-                )
-                print("Scaled up: " + json.dumps(response))
+                    print("Ignoring " + service_arn + "...")
+                    continue
             else:
-                print("Ignoring " + service_arn + "...")
+                print("Tags not supported yet for service: " + response['serviceArn'])
                 continue
