@@ -71,8 +71,8 @@ def lambda_handler(event, context):
                     'TAGS',
                 ]
             )
-            print(str(response))  
-            response = response.get(services)
+            print(str(response))
+            response = response["services"]
             response = response[0]
             print(str(response))
             print("Checking if Tags are supported yet for service: " + response['serviceArn'])
