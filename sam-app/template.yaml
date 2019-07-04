@@ -34,7 +34,7 @@ Resources:
 Outputs:
   ECSServiceSchedulerFunction:
     Description: "ECSServiceScheduler Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
+    Value: !GetAtt ECSServiceSchedulerFunction.Arn
   ECSServiceSchedulerFunctionIamRole:
     Description: "Implicit IAM Role created for ECSServiceScheduler function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+    Value: !GetAtt ECSServiceSchedulerFunction.Arn
