@@ -44,16 +44,18 @@ def lambda_handler(event, context):
     service_footprint={}
     for cluster_arn in cluster_arns:
         service_arns=[]
-        response = client.list_services(cluster=cluster_arn)
-        service_arns += response['serviceArns']
-        while "nextToken" in response:
-            response = client.list_services(
-                nextToken=response['nextToken'],
-                cluster=cluster_arn
-            )
+        if cluster_arn in ["arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-003","arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-004"] # for now, only take action on these 2 clusters
+            response = client.list_services(cluster=cluster_arn)
             service_arns += response['serviceArns']
-        service_footprint[cluster_arn] = service_arns
-    print("Found the following cluster ARNs:")
+            while "nextToken" in response:
+                response = client.list_services(
+                    nextToken=response['nextToken'],
+                    cluster=cluster_arn
+                )
+                service_arns += response['serviceArns']
+            service_footprint[cluster_arn] = service_arns
+
+    print("Found the following service footprint:")
     print(json.dumps(service_footprint))
 
     # a for loop thru all the services per cluster, that checks their tag and if set, updates accordingly
