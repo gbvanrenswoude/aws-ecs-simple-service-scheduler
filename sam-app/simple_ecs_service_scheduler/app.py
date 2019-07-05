@@ -98,7 +98,7 @@ def lambda_handler(event, context):
                         service=service_arn,
                         desiredCount=desiredcount
                     )
-                    print("Scaled up: " + service_arn)
+                    print("Scaled up: " + service_arn + "to desiredcount " + str(desiredcount))
                 else:
                     print("Ignoring " + service_arn + "...")
                     continue
