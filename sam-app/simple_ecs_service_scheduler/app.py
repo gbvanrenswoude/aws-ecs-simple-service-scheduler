@@ -44,7 +44,7 @@ def lambda_handler(event, context):
     service_footprint={}
     for cluster_arn in cluster_arns:
         service_arns=[]
-        if cluster_arn in ["arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-003","arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-004"] # for now, only take action on these 2 clusters
+        if cluster_arn in ["arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-003","arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-004"]: # for now, only take action on these 2 clusters
             response = client.list_services(cluster=cluster_arn)
             service_arns += response['serviceArns']
             while "nextToken" in response:
