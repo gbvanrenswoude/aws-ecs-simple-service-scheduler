@@ -102,7 +102,7 @@ def lambda_handler(event, context):
                 elif optout not in response['tags'] and behavior == 'scaleup':
                     tags = {}
                     for tag in response['tags']:
-                        tags[tag['Key']] = tag['Value']
+                        tags[tag['key']] = tag['value']
                     if "DesiredCountUp" in tags:
                         desiredcount = tags['DesiredCountUp']
                         if not desiredcount.is_integer():
