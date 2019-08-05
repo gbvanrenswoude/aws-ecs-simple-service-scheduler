@@ -15,3 +15,6 @@ Does not support setting times, since it is running stateless
 #### Deployment
 Deployment is handled by Concourse across branches. Concourse is not configured to enforce version tracking across the git flow. (meaning commits to every branch will just run the pipeline for that branch.)   
 Master branch pipeline: ![CI](https://services.esb.t16.cldsvc.net/api/v1/teams/main/pipelines/generic-esb-infra/jobs/deploy-ess-master/badge)
+
+#### Note
+Check your timezone setting in the template.yaml.
