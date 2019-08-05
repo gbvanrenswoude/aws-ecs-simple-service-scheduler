@@ -85,7 +85,7 @@ def lambda_handler(event, context):
                 if optout not in response['tags'] and behavior == 'scaledown':
                     tags = {}
                     for tag in response['tags']:
-                        tags[tag['Key']] = tag['Value']
+                        tags[tag['key']] = tag['value']
                     if "DesiredCountDown" in tags:
                         desiredcount = tags['DesiredCountDown']
                         if not desiredcount.is_integer():
