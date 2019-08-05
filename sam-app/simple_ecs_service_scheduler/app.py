@@ -88,9 +88,12 @@ def lambda_handler(event, context):
                         tags[tag['key']] = tag['value']
                     if "DesiredCountDown" in tags:
                         desiredcount = tags['DesiredCountDown']
-                        if not desiredcount.is_integer():
-                            print("DesiredCountDown Tag set but not as integer, defaulting to 0")
+                        try:
+                            desiredcount = int(desiredcount)
+                        except ValueError as ex:
+                            print('DesiredCountDown "%s" cannot be converted to an int: %s , defaulting to 0' % (desiredcount, ex))
                             desiredcount = 0
+                            pass
                     else:
                         desiredcount = 0
                     response = client.update_service(
@@ -105,9 +108,12 @@ def lambda_handler(event, context):
                         tags[tag['key']] = tag['value']
                     if "DesiredCountUp" in tags:
                         desiredcount = tags['DesiredCountUp']
-                        if not desiredcount.is_integer():
-                            print("DesiredCountUp Tag set but not as integer, defaulting to 1")
+                        try:
+                            desiredcount = int(desiredcount)
+                        except ValueError as ex:
+                            print('DesiredCountUp "%s" cannot be converted to an int: %s , defaulting to 1' % (desiredcount, ex))
                             desiredcount = 1
+                            pass
                     else:
                         desiredcount = 1
                     response = client.update_service(
