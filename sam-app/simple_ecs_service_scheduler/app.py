@@ -80,8 +80,8 @@ def lambda_handler(event, context):
             if "tags" in response:
                 print("Tags set for service: " + response['serviceArn'])
                 print("The following tags are set: " + str(response['tags']))
-                taglist = response['tags'] # this returns a list
-                if "NoAutoOff" not in response['tags'] and behavior == 'scaledown':
+                # taglist = response['tags'] # this returns a list
+                if "{'key': 'NoAutoOff', 'value': 'true'}" not in response['tags'] and behavior == 'scaledown':
                     if "DesiredCountDown" in response['tags']:
                         desiredcount = response['tags']['DesiredCountDown']
                     else:
@@ -92,7 +92,7 @@ def lambda_handler(event, context):
                         desiredCount=desiredcount
                     )
                     print("Scaled down: " + service_arn)
-                elif "NoAutoOff" not in response['tags'] and behavior == 'scaleup':
+                elif "{'key': 'NoAutoOff', 'value': 'true'}" not in response['tags'] and behavior == 'scaleup':
                     if "DesiredCountUp" in response['tags']:
                         desiredcount = response['tags']['DesiredCountUp']
                     else:
