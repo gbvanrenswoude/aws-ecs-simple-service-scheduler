@@ -89,7 +89,7 @@ def lambda_handler(event, context):
                     if "DesiredCountDown" in tags:
                         desiredcount = tags['DesiredCountDown']
                         if not desiredcount.is_integer():
-                            print "DesiredCountDown Tag set but not as integer, defaulting to 0"
+                            print("DesiredCountDown Tag set but not as integer, defaulting to 0")
                             desiredcount = 0
                     else:
                         desiredcount = 0
@@ -106,7 +106,7 @@ def lambda_handler(event, context):
                     if "DesiredCountUp" in tags:
                         desiredcount = tags['DesiredCountUp']
                         if not desiredcount.is_integer():
-                            print "DesiredCountUp Tag set but not as integer, defaulting to 1"
+                            print("DesiredCountUp Tag set but not as integer, defaulting to 1")
                             desiredcount = 1
                     else:
                         desiredcount = 1
