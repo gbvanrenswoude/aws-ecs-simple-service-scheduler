@@ -30,6 +30,7 @@ def lambda_handler(event, context):
 
     # list clusters
     cluster_arns = []
+    cluster_arns_to_take_action_on = ["arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-003","arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-004"] # for now, only take action on these clusters
     response = client.list_clusters(
     )
     cluster_arns += response['clusterArns']
@@ -44,7 +45,7 @@ def lambda_handler(event, context):
     service_footprint={}
     for cluster_arn in cluster_arns:
         service_arns=[]
-        if cluster_arn in ["arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-003","arn:aws:ecs:eu-west-1:714079672139:cluster/pnltecs-t01ew1xx-004"]: # for now, only take action on these 2 clusters
+        if cluster_arn in cluster_arns_to_take_action_on:
             response = client.list_services(cluster=cluster_arn)
             service_arns += response['serviceArns']
             while "nextToken" in response:
@@ -82,8 +83,14 @@ def lambda_handler(event, context):
                 # print("The following tags are set: " + str(response['tags']))
                 optout = {'key': 'NoAutoOff', 'value': 'true'}
                 if optout not in response['tags'] and behavior == 'scaledown':
-                    if "DesiredCountDown" in response['tags']:
-                        desiredcount = response['tags']['DesiredCountDown']
+                    tags = {}
+                    for tag in response['tags']:
+                        tags[tag['Key']] = tag['Value']
+                    if "DesiredCountDown" in tags:
+                        desiredcount = tags['DesiredCountDown']
+                        if not desiredcount.is_integer():
+                            print "DesiredCountDown Tag set but not as integer, defaulting to 0"
+                            desiredcount = 0
                     else:
                         desiredcount = 0
                     response = client.update_service(
@@ -93,8 +100,14 @@ def lambda_handler(event, context):
                     )
                     print("Scaled down: " + service_arn)
                 elif optout not in response['tags'] and behavior == 'scaleup':
-                    if "DesiredCountUp" in response['tags']:
-                        desiredcount = response['tags']['DesiredCountUp']
+                    tags = {}
+                    for tag in response['tags']:
+                        tags[tag['Key']] = tag['Value']
+                    if "DesiredCountUp" in tags:
+                        desiredcount = tags['DesiredCountUp']
+                        if not desiredcount.is_integer():
+                            print "DesiredCountUp Tag set but not as integer, defaulting to 1"
+                            desiredcount = 1
                     else:
                         desiredcount = 1
                     response = client.update_service(
