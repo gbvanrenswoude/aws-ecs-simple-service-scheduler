@@ -1,8 +1,8 @@
 ### A simple MVP ECS service scheduler.
 Simple service scheduler for ECS. Queries out all running clusters. For each cluster, describes services and their tags.  
 If the tag NoAutoOff is set with the value to `true`, will skip taking action on the service.  
-If the tag DesiredCountUp is set to n, will update the service to desiredcount n at 7am.  
-If the tag DesiredCountDown is set to n, will update the service to desiredcount n at 7pm.  
+Coming: If the tag DesiredCountUp is set to n, will update the service to desiredcount n at 7am.  
+Coming: If the tag DesiredCountDown is set to n, will update the service to desiredcount n at 7pm.  
 Cloudwatch rules will fire 2 events called 7amweekdays and 7pmweekdays every workday to trigger the scaling up and scaling down.  
 Their json payload is:  
 `{'rulename': '7amweekdays', 'behavior': 'scaleup'}`  
@@ -18,5 +18,4 @@ Master branch pipeline: ![CI](https://services.esb.t16.cldsvc.net/api/v1/teams/m
 
 
 #### TODO
-- Handle funny DesiredCountUp and DesiredCountDown tag values
-- Test NoAutoOff tag workings
+- Handle (funny) DesiredCountUp and DesiredCountDown tag values

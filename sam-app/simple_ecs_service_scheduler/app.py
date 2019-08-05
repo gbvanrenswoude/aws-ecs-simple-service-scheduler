@@ -75,12 +75,11 @@ def lambda_handler(event, context):
             )
             response = response["services"]
             response = response[0]
-            print(str(response))
+            # print(str(response))
             print("Checking if Tags are supported yet for service: " + response['serviceArn'])
             if "tags" in response:
                 print("Tags set for service: " + response['serviceArn'])
-                print("The following tags are set: " + str(response['tags']))
-                # taglist = response['tags'] # this returns a list
+                # print("The following tags are set: " + str(response['tags']))
                 optout = {'key': 'NoAutoOff', 'value': 'true'}
                 if optout not in response['tags'] and behavior == 'scaledown':
                     if "DesiredCountDown" in response['tags']:
